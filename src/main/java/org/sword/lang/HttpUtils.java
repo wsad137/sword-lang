@@ -5,9 +5,6 @@ package org.sword.lang;
 
 
 
-import java.io.File;
-import java.io.InputStream;
-
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.fluent.Request;
@@ -15,6 +12,9 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.InputStream;
 
 
 /**

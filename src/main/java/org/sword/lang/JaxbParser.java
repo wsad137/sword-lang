@@ -3,21 +3,17 @@
  */
 package org.sword.lang;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringWriter;
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import org.apache.log4j.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
-import org.apache.log4j.Logger;
-
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author ChengNing
@@ -29,7 +25,8 @@ public class JaxbParser {
 	
 	private Class clazz;
 	private String[] cdataNode;
-	
+	private String config="utf-8";
+
 	/**
 	 * 
 	 * @param clazz
@@ -56,19 +53,27 @@ public class JaxbParser {
 		try {
 			JAXBContext context = JAXBContext.newInstance(obj.getClass());
 			Marshaller m = context.createMarshaller();
-			m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+
+//			String encoding = Config.instance().getJaxb_encoding();
+			String encoding = config;
+			logger.debug("toXML encoding " + encoding + "System file.encoding " + System.getProperty("file.encoding"));
+
+			m.setProperty(Marshaller.JAXB_ENCODING, encoding);
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			m.setProperty(Marshaller.JAXB_FRAGMENT, true);// 去掉报文头
-		    OutputStream os = new ByteOutputStream();
-			StringWriter writer = new StringWriter();
+
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			XMLSerializer serializer = getXMLSerializer(os);
+
 			m.marshal(obj, serializer.asContentHandler());
-			result = os.toString();
+
+			result = os.toString(encoding);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		logger.info("response text:" + result);
 		return result;
+
 	}
 	
 
@@ -107,17 +112,21 @@ public class JaxbParser {
 	 * @return
 	 */
 	private XMLSerializer getXMLSerializer(OutputStream os) {
-        OutputFormat of = new OutputFormat();
-        formatCDataTag();
-        of.setCDataElements(cdataNode);   
-        of.setPreserveSpace(true);
-        of.setIndenting(true);
-        of.setOmitXMLDeclaration(true);
-        XMLSerializer serializer = new XMLSerializer(of);
-        serializer.setOutputByteStream(os);
-        return serializer;
-    }
-	
+		OutputFormat of = new OutputFormat();
+		formatCDataTag();
+		of.setCDataElements(cdataNode);
+		of.setPreserveSpace(true);
+		of.setIndenting(true);
+		of.setOmitXMLDeclaration(true);
+
+		String encoding = config;
+		of.setEncoding(encoding);
+		XMLSerializer serializer = new XMLSerializer(of);
+		serializer.setOutputByteStream(os);
+		return serializer;
+	}
+
+
 	/**
 	 * 适配cdata tag
 	 */
