@@ -3,14 +3,11 @@
  */
 package org.sword.lang;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.junit.Test;
-import org.sword.lang.DateTimeUtil;
+import static org.junit.Assert.assertEquals;
 
 
 /**
